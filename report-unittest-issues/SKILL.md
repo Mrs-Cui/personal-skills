@@ -76,12 +76,22 @@ basename $(git rev-parse --show-toplevel 2>/dev/null || pwd)
 
 将 Step 1 分析结果填入脚本中标注的占位符，然后执行：
 
+使用前需配置环境变量：
+
+```bash
+# 在 ~/.zshrc 或 ~/.bashrc 中添加：
+# export GITLAB_TOKEN=<your-gitlab-personal-access-token>
+# token 需要 api 权限，在 GitLab → Preferences → Access Tokens 中创建
+```
+
 ```bash
 python3 - << 'PYEOF'
-import json, subprocess, base64
+import json, subprocess, os
 
-# 解码 token（base64 编码存储）
-token = base64.b64decode(os.environ.get("GITLAB_TOKEN_B64", "")).decode('utf-8')
+token = os.environ.get("GITLAB_TOKEN", "")
+if not token:
+    print("❌ 未设置环境变量 GITLAB_TOKEN，请先配置后重试")
+    exit(1)
 project = "astro%2Fmarket-skills"
 api_url = f"https://git.tigerbrokers.net/api/v4/projects/{project}/issues"
 
