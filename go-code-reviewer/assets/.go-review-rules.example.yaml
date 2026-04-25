@@ -1,0 +1,38 @@
+# Go Code Reviewer 自定义规则配置
+# 将此文件复制为 .go-review-rules.yaml 放在项目根目录
+
+# 基础规则集: general | microservice | cli
+base: general
+
+# 严格度覆盖（按路径匹配）
+# level: strict | normal | relaxed
+severity_overrides:
+  - path: "internal/core/**"
+    level: strict
+  - path: "internal/service/**"
+    level: strict
+  - path: "cmd/**"
+    level: normal
+  - path: "scripts/**"
+    level: relaxed
+  - path: "**_test.go"
+    level: relaxed
+  - path: "tools/**"
+    level: relaxed
+
+# 团队自定义规则
+custom_rules:
+  # - id: "team/no-direct-db-in-handler"
+  #   description: "handler层禁止直接操作数据库"
+  #   severity: error
+  #   pattern: "handler层中出现sql.DB/gorm.DB/sqlx.DB的直接调用"
+  #
+  # - id: "team/service-via-interface"
+  #   description: "service层必须通过interface调用"
+  #   severity: warning
+  #   pattern: "service间直接依赖具体struct而非interface"
+
+# 忽略规则（跳过指定检查项）
+ignore: []
+  # - "style/line-length"
+  # - "style/comment-format"

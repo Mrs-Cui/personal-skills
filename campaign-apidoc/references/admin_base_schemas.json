@@ -1,0 +1,47 @@
+{
+  "_usage": "通用组件模板。schemas 部分（CommonResponse 等）适用于所有非 front 层文档，直接复制到 components/schemas 中复用。parameters 部分（内网签名 Header）仅适用于 intranet 层中路由组加了 InnerSignMiddlewareWithApollo() 的接口（如 rewardv2.Internal、member2.Internal、activity.Internal、score2.Internal），其他层（admin、infra 等）不要引用这 4 个参数。",
+  "parameters": {
+    "HeaderInnerAppId": { "name": "inner-app-id", "in": "header", "required": true, "schema": { "type": "string" }, "description": "调用方应用标识" },
+    "HeaderNonce":      { "name": "nonce",         "in": "header", "required": true, "schema": { "type": "string" }, "description": "随机数" },
+    "HeaderTimestamp":  { "name": "timestamp",     "in": "header", "required": true, "schema": { "type": "string" }, "description": "毫秒时间戳" },
+    "HeaderSign":       { "name": "sign",          "in": "header", "required": true, "schema": { "type": "string" }, "description": "签名，算法：MD5(inner-app-id + secret + timestamp + nonce)" }
+  },
+  "schemas": {
+    "CommonResponse": {
+      "type": "object",
+      "description": "统一响应结构",
+      "properties": {
+        "code":     { "type": "integer", "description": "业务状态码，0表示成功，非0表示失败" },
+        "message":  { "type": "string",  "description": "业务提示信息或错误信息" },
+        "data":     { "description": "业务数据载体，结构由具体接口定义", "nullable": true },
+        "trace_id": { "type": "string",  "description": "链路追踪ID" },
+        "is_succ":  { "type": "boolean", "description": "是否成功，code==0为true" }
+      },
+      "required": ["code", "message", "data", "trace_id", "is_succ"]
+    },
+    "ResponseSuccess": {
+      "allOf": [
+        { "$ref": "#/components/schemas/CommonResponse" },
+        { "type": "object", "properties": { "data": { "nullable": true, "description": "操作成功，无返回数据" } } }
+      ]
+    },
+    "ResponseCreated": {
+      "allOf": [
+        { "$ref": "#/components/schemas/CommonResponse" },
+        { "type": "object", "properties": { "data": { "type": "object", "properties": { "id": { "type": "integer", "description": "创建的资源ID" } } } }, "required": ["data"] }
+      ]
+    },
+    "ResponseDeleted": {
+      "allOf": [
+        { "$ref": "#/components/schemas/CommonResponse" },
+        { "type": "object", "properties": { "data": { "nullable": true, "description": "删除成功，无返回数据" } } }
+      ]
+    },
+    "ResponseUpdated": {
+      "allOf": [
+        { "$ref": "#/components/schemas/CommonResponse" },
+        { "type": "object", "properties": { "data": { "nullable": true, "description": "更新成功，无返回数据" } } }
+      ]
+    }
+  }
+}
